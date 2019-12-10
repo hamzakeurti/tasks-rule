@@ -11,7 +11,7 @@ class Encoder(nn.Module):
 
         self.pool = nn.MaxPool2d(3,padding = 3//2,stride = 2)
         self.relu = nn.ReLU()
-
+        self.pool_final = nn.MaxPool2d(7)
     def forward(self,x):
         x = self.pool(self.relu(self.conv1(x)))
         V1 = x
@@ -24,6 +24,15 @@ class Encoder(nn.Module):
 
         x = self.pool(self.relu(self.conv4(x)))
         IT = x
-
-        return V1,V2,V4,IT
         
+        x = self.pool_final(x)
+        return V1,V2,V4,IT,x
+
+class Classification_Decoder(nn.Module):
+    # Same model for single class and multi-class classification, just change the loss function
+    def __init__(self,in_dim, out_dim):
+        super(Classification_Decoder,self).__init__()
+        self.linear = nn.Linear(in_dim,out_dim)
+    def forward(self,x):
+        x = self.linear(x)
+        return x
