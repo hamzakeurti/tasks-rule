@@ -10,7 +10,7 @@ A study of the role of tasks in shaping visual processing
 - Task 2: Ten-class classification task
   - Images are from ImageNet.
   - The dataset consists of 60,000 images and ten categories. Each category contains 6,000 images.
-  - The compressed file 10-class-classification-dataset.rar is in /data4/chenhaoran.
+  - The compressed file 10-class-classification-dataset.rar is in `/data4/chenhaoran` on img16.
   - There are ten folders in the compressed file and the name of each folder is the category name.
 
 # fMRI data:
