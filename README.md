@@ -13,7 +13,7 @@ A study of the role of tasks in shaping visual processing
   - The dataset consists of 60,000 images and ten categories. Each category contains 6,000 images.
   - The compressed file 10-class-classification-dataset.rar is in `/data4/chenhaoran` on img16.
   - There are ten folders in the compressed file and the name of each folder is the category name.
-- Task 3: 20-class-multilabel classification task
+- Task 3: 20-class-multilabel classification task [link](https://github.com/hamzakeurti/tasks-rule/blob/master/data/20-multilabel-classification-task.pkl)
   - Images are from MS-COCO.
   - The dataset consists of 60, 000 images and twenty categories.
   - Pickle file organization structure = [dataset, label_description], dataset = [image id list, labels list], label description = {label: category name}.
