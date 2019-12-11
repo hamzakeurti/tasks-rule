@@ -3,7 +3,7 @@ A study of the role of tasks in shaping visual processing
 
 
 # Tasks studied:
-- Task 1 : [link](Single-class classification task).
+- Task 1 : Single-class classification task [link](https://github.com/hamzakeurti/tasks-rule/blob/master/data/single-class-classification-dataset.pkl).
   - Images are from MS-COCO.
   - There are 50,000 images in the training set and 10,000 images in the test set.
   - Pickle file organization structure: [training set, test_set], training set = [image id list, label list], test set = [image id list, label list].
