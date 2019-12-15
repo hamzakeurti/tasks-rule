@@ -5,33 +5,43 @@ import torch.optim as optim
 import numpy as np
 from utils import LOG_INFO
 from model import Encoder,Classification_Decoder
+from copy import deepcopy
 
-TRAIN_BATCH_SIZE = 100
-TEST_BATCH_SIZE = 100
-LOG_INTERVAL = 50
-EPOCHS = 20
+import argparse
+parser = argparse.ArgumentParser()
+parser.add_argument("task_name",type=str,help="Name of the task for file naming purposes")
+parser.add_argument("dataset",type=str,help = "pickle file associated to the dataset")
 
-LR = 0.01
-MM = 0.8
-WD = 0.0
-Encoder_out = 512
-Decoder_out = 51
+parser.add_argument("device",type = str,default="cuda")
+
+parser.add_argument("batch_size",type=int,help="Batch size",default=100)
+parser.add_argument("LOG_INTERVAL",type=int,default=50)
+parser.add_argument("EPOCHS",type=int,default=50)
 
 
-device = 'cuda:0'
+parser.add_argument("momentum",type = float,default=0.)
+parser.add_argument("learning_rate",type=float,default=0.01)
+parser.add_argument("weight_decay",type=float,default=0.)
+parser.add_argument("Encoder_out",type=int,default=512)
+parser.add_argument("Decoder_out",type=int,default=10)
+
+args = parser.parse_args()
+
+
+
+device = args.device
 kwargs = {'num_workers': 1, 'pin_memory': True}
 
-train_loader
-test_loader
 
 encoder = Encoder()
-decoder = Classification_Decoder(Encoder_out,Decoder_out).to(device)
+decoder = Classification_Decoder(args.Encoder_out,args.Decoder_out).to(device)
 
 params = list(encoder.parameters()) + list(decoder.parameters())
-optimizer = optim.SGD(params, lr=LR, momentum=MM, weight_decay=WD)
+optimizer = optim.SGD(params, lr=args.learning_rate, momentum=args.momentum, weight_decay=args.weight_decay)
 
-def train(model, device, train_loader, optimizer, epoch):
-    model.train()
+def train(encoder,decoder, device, train_loader, optimizer, epoch):
+    encoder.train()
+    decoder.train()
     loss_list = []
     acc_list = []
     saved_loss_list = []
@@ -39,9 +49,9 @@ def train(model, device, train_loader, optimizer, epoch):
     for batch_idx, (data, target) in enumerate(train_loader):
         data, target = data.to(device), target.to(device)
         optimizer.zero_grad()
-        output = model(data)
-        output.view(-1,512)
-
+        output = encoder(data)
+        output = output.view(-1,args.Encoder_out)
+        output = decoder(output)
         loss = F.cross_entropy(output, target)
         loss.backward()
         optimizer.step()
@@ -49,7 +59,7 @@ def train(model, device, train_loader, optimizer, epoch):
         pred = output.argmax(dim=1, keepdim=True) # get the index of the max log-probability
         acc = pred.eq(target.view_as(pred)).float().mean()
         acc_list.append(acc.item())
-        if batch_idx % LOG_INTERVAL == 0:
+        if batch_idx % args.LOG_INTERVAL == 0:
             msg = 'Train Epoch: {} [{}/{} ({:.0f}%)]\tAvg Loss: {:.4f}\tAvg Acc: {:.4f}'.format(
                 epoch, batch_idx * len(data), len(train_loader.dataset),
                 100. * batch_idx / len(train_loader), np.mean(loss_list), np.mean(acc_list))
@@ -61,14 +71,17 @@ def train(model, device, train_loader, optimizer, epoch):
     return saved_loss_list,saved_acc_list
 
 
-def test(model, device, test_data,test_label):
-    model.eval()
+def test(encoder,decoder, device, test_data,test_label):
+    encoder.eval()
+    decoder.eval()
     test_loss = 0
     correct = 0
     with torch.no_grad():
         data, target = test_data.to(device), test_label.to(device)
         data = data.view(data.shape[0],1,28,28)
-        output = model(data)
+        output = encoder(data)
+        output = output.view(-1,args.Encoder_out)
+        output = decoder(output)
         test_loss += F.cross_entropy(output, target).item() # sum up batch loss
         pred = output.argmax(dim=1, keepdim=True) # get the index of the max log-probability
         correct += pred.eq(target.view_as(pred)).sum().item()
@@ -81,15 +94,19 @@ def test(model, device, test_data,test_label):
     return test_loss,correct/len(test_data)
 
 if __name__=='__main__':
+    min_loss = 5000
     train_losses,train_accs,test_losses,test_accs = [],[],[],[]
-    for epoch in range(1, EPOCHS + 1):
-        train_loss, train_acc = train(model, device, train_loader, optimizer, epoch)
-        test_loss,test_acc = test(model, device, test_data,test_label)
+    for epoch in range(1, args.EPOCHS + 1):
+        train_loss, train_acc = train(encoder,decoder, device, train_loader, optimizer, epoch)
+        test_loss,test_acc = test(encoder,decoder, device, test_data,test_label)
         train_losses.extend(train_loss)
         train_accs.extend(train_acc)
         test_losses.append(test_loss)
         test_accs.append(test_acc)
-    prefix = 'CNN_'
+        if test_loss<min_loss:
+            min_loss = test_loss
+            best_model = deepcopy(encoder)
+    prefix = args.task_name
     np.save(prefix + 'test_losses.npy',test_losses)
     np.save(prefix + 'train_losses.npy',train_losses)
     np.save(prefix + 'test_accs.npy',test_accs)
