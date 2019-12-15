@@ -11,8 +11,8 @@ def pickle_to_dataset(pickle):
     train,test = d
     return train,test
 
-def ID_to_picture(image_id):
-    image_path = "./train2014/COCO_train2014_%012d.jpg" % (image_id)
+def ID_to_picture(image_id,mode = "train"):
+    image_path = "./%s2014/COCO_%s2014_%012d.jpg" % (mode,mode,image_id)
     image = Image.open(image_path)
     image = asarray(image)
     image = image.resize((224,224))
@@ -20,16 +20,18 @@ def ID_to_picture(image_id):
 
 
 class Classification_dataset(Dataset):
-    def __init__(self,pickle,mode="Train"):
+    def __init__(self,pickle,mode="train"):
         train,test = pickle_to_dataset(pickle)
         self.data = test[0]
         self.labels = test[1]
-        if mode =="Train":
+        if mode =="train":
             self.data = train[0]
             self.labels = train[1]
+            
+        self.mode=mode
         def __len__(self):
             return len(self.data)
         
         def __getitem__(self,idx):
-            image = ID_to_picture(self.data[idx])
+            image = ID_to_picture(self.data[idx],self.mode)
             return image,self.labels[idx]
