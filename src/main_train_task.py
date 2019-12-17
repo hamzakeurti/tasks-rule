@@ -39,7 +39,7 @@ device = args.device
 kwargs = {'num_workers': 1, 'pin_memory': True}
 
 
-encoder = Encoder()
+encoder = Encoder().to(device)
 decoder = Classification_Decoder(args.Encoder_out,args.Decoder_out).to(device)
 
 params = list(encoder.parameters()) + list(decoder.parameters())
@@ -56,7 +56,7 @@ def train(encoder,decoder, device, train_loader, optimizer, epoch):
         data, target = data.to(device), target.to(device)
         optimizer.zero_grad()
         output = encoder(data)
-        output = output.view(-1,args.Encoder_out)
+        output = output[4].view(-1,args.Encoder_out)
         output = decoder(output)
         loss = F.cross_entropy(output, target)
         loss.backward()
@@ -87,7 +87,7 @@ def test(encoder,decoder, device, test_loader):
             data, target = data.to(device), target.to(device)
             data = data.view(data.shape[0],1,28,28)
             output = encoder(data)
-            output = output.view(-1,args.Encoder_out)
+            output = output[4].view(-1,args.Encoder_out)
             output = decoder(output)
             test_loss += F.cross_entropy(output, target).item() # sum up batch loss
             pred = output.argmax(dim=1, keepdim=True) # get the index of the max log-probability
