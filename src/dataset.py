@@ -11,8 +11,8 @@ def pickle_to_dataset(pickle_file):
     train,test = d
     return train,test
 
-def ID_to_picture(image_id,mode = "train"):
-    image_path = "/data4/chenhaoran/mscoco/%s2014/COCO_%s2014_%012d.jpg" % (mode,mode,image_id)
+def ID_to_picture(image_id):
+    image_path = "/data4/chenhaoran/mscoco/train2014/COCO_train2014_%012d.jpg" % (image_id)
     image = Image.open(image_path)
     image = asarray(image)
     image = np.resize(image,(224,224,3))
