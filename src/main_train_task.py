@@ -84,7 +84,7 @@ def test(encoder,decoder, device, test_loader):
     correct = 0
     with torch.no_grad():
         for batch_idx, (data, target) in enumerate(test_loader):
-            data, target = test_data.to(device), test_label.to(device)
+            data, target = data.to(device), target.to(device)
             data = data.view(data.shape[0],1,28,28)
             output = encoder(data)
             output = output.view(-1,args.Encoder_out)
