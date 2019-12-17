@@ -36,5 +36,5 @@ class Classification_dataset(Dataset):
         return len(self.data)
         
     def __getitem__(self,idx):
-        image = ID_to_picture(self.data[idx],self.mode)
+        image = ID_to_picture(self.data[idx])
         return image,self.labels[idx]
