@@ -18,7 +18,7 @@ def ID_to_picture(image_id,mode = "train"):
     image = np.resize(image,(224,224,3))
     image=np.swapaxes(image,0,2)
     image = np.swapaxes(image,1,2)
-    image = np.ndarray.astype(image,np.float)
+    image = np.ndarray.astype(image,np.float32)/255
     return image
 
 
