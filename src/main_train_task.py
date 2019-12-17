@@ -3,14 +3,16 @@ import torch.nn as nn
 import torch.nn.functional as F
 import torch.optim as optim
 import numpy as np
+from torch.utils.data import DataLoader
 from utils import LOG_INFO
 from model import Encoder,Classification_Decoder
 from copy import deepcopy
-
+from dataset import Classification_dataset
 import argparse
+
 parser = argparse.ArgumentParser()
 parser.add_argument("task_name",type=str,help="Name of the task for file naming purposes")
-parser.add_argument("dataset",type=str,help = "pickle file associated to the dataset")
+parser.add_argument("dataset",type=str,help = "pickle file associated to the dataset",default = "data/single-class-classification-dataset.pkl")
 
 parser.add_argument("device",type = str,default="cuda")
 
@@ -27,7 +29,11 @@ parser.add_argument("Decoder_out",type=int,default=10)
 
 args = parser.parse_args()
 
+train_dataset = Classification_dataset(args.dataset)
+test_dataset = Classification_dataset(args.dataset,mode="test")
 
+train_loader = DataLoader(train_dataset,batch_size=args.batch_size)
+test_loader = DataLoader(test_dataset,batch_size=args.batch_size)
 
 device = args.device
 kwargs = {'num_workers': 1, 'pin_memory': True}
@@ -71,20 +77,21 @@ def train(encoder,decoder, device, train_loader, optimizer, epoch):
     return saved_loss_list,saved_acc_list
 
 
-def test(encoder,decoder, device, test_data,test_label):
+def test(encoder,decoder, device, test_loader):
     encoder.eval()
     decoder.eval()
     test_loss = 0
     correct = 0
     with torch.no_grad():
-        data, target = test_data.to(device), test_label.to(device)
-        data = data.view(data.shape[0],1,28,28)
-        output = encoder(data)
-        output = output.view(-1,args.Encoder_out)
-        output = decoder(output)
-        test_loss += F.cross_entropy(output, target).item() # sum up batch loss
-        pred = output.argmax(dim=1, keepdim=True) # get the index of the max log-probability
-        correct += pred.eq(target.view_as(pred)).sum().item()
+        for batch_idx, (data, target) in enumerate(test_loader):
+            data, target = test_data.to(device), test_label.to(device)
+            data = data.view(data.shape[0],1,28,28)
+            output = encoder(data)
+            output = output.view(-1,args.Encoder_out)
+            output = decoder(output)
+            test_loss += F.cross_entropy(output, target).item() # sum up batch loss
+            pred = output.argmax(dim=1, keepdim=True) # get the index of the max log-probability
+            correct += pred.eq(target.view_as(pred)).sum().item()
 
     test_loss /= len(test_data)
 
@@ -98,7 +105,7 @@ if __name__=='__main__':
     train_losses,train_accs,test_losses,test_accs = [],[],[],[]
     for epoch in range(1, args.EPOCHS + 1):
         train_loss, train_acc = train(encoder,decoder, device, train_loader, optimizer, epoch)
-        test_loss,test_acc = test(encoder,decoder, device, test_data,test_label)
+        test_loss,test_acc = test(encoder,decoder, device, test_loader)
         train_losses.extend(train_loss)
         train_accs.extend(train_acc)
         test_losses.append(test_loss)
