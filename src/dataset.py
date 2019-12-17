@@ -3,7 +3,7 @@ import os
 from torch.utils.data import Dataset, DataLoader
 from PIL import Image
 from numpy import asarray
-
+import numpy as np
 
 def pickle_to_dataset(pickle_file):
     data = open(pickle_file,"rb")
@@ -12,10 +12,13 @@ def pickle_to_dataset(pickle_file):
     return train,test
 
 def ID_to_picture(image_id,mode = "train"):
-    image_path = "./%s2014/COCO_%s2014_%012d.jpg" % (mode,mode,image_id)
+    image_path = "/data4/chenhaoran/mscoco/%s2014/COCO_%s2014_%012d.jpg" % (mode,mode,image_id)
     image = Image.open(image_path)
     image = asarray(image)
-    image = image.resize((224,224))
+    image = np.resize(image,(224,224,3))
+    image=np.swapaxes(image,0,2)
+    image = np.swapaxes(image,1,2)
+    image = np.ndarray.astype(image,np.float)
     return image
 
 

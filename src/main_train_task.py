@@ -11,26 +11,26 @@ from dataset import Classification_dataset
 import argparse
 
 parser = argparse.ArgumentParser()
-parser.add_argument("task_name",type=str,help="Name of the task for file naming purposes")
-parser.add_argument("dataset",type=str,help = "pickle file associated to the dataset",default = "data/single-class-classification-dataset.pkl")
+parser.add_argument("--task_name",type=str,help="Name of the task for file naming purposes")
+parser.add_argument("--dataset",type=str,help = "pickle file associated to the dataset",default = "data/single-class-classification-dataset.pkl")
 
-parser.add_argument("device",type = str,default="cuda")
+parser.add_argument("--device",type = str,default="cuda")
 
-parser.add_argument("batch_size",type=int,help="Batch size",default=100)
-parser.add_argument("LOG_INTERVAL",type=int,default=50)
-parser.add_argument("EPOCHS",type=int,default=50)
+parser.add_argument("--batch_size",type=int,help="Batch size",default=100)
+parser.add_argument("--LOG_INTERVAL",type=int,default=50)
+parser.add_argument("--EPOCHS",type=int,default=50)
 
 
-parser.add_argument("momentum",type = float,default=0.)
-parser.add_argument("learning_rate",type=float,default=0.01)
-parser.add_argument("weight_decay",type=float,default=0.)
-parser.add_argument("Encoder_out",type=int,default=512)
-parser.add_argument("Decoder_out",type=int,default=10)
+parser.add_argument("--momentum",type = float,default=0.)
+parser.add_argument("--learning_rate",type=float,default=0.01)
+parser.add_argument("--weight_decay",type=float,default=0.)
+parser.add_argument("--Encoder_out",type=int,default=512)
+parser.add_argument("--Decoder_out",type=int,default=10)
 
 args = parser.parse_args()
 
 train_dataset = Classification_dataset(args.dataset)
-test_dataset = Classification_dataset(args.dataset,mode="test")
+test_dataset = Classification_dataset(args.dataset,mode="val")
 
 train_loader = DataLoader(train_dataset,batch_size=args.batch_size)
 test_loader = DataLoader(test_dataset,batch_size=args.batch_size)
