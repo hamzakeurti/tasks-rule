@@ -85,20 +85,18 @@ def test(encoder,decoder, device, test_loader):
     with torch.no_grad():
         for batch_idx, (data, target) in enumerate(test_loader):
             data, target = data.to(device), target.to(device)
-            data = data.view(data.shape[0],1,28,28)
             output = encoder(data)
             output = output[4].view(-1,args.Encoder_out)
             output = decoder(output)
             test_loss += F.cross_entropy(output, target).item() # sum up batch loss
             pred = output.argmax(dim=1, keepdim=True) # get the index of the max log-probability
             correct += pred.eq(target.view_as(pred)).sum().item()
-
-    test_loss /= len(test_data)
-
+    size = len(test_loader) * args.batch_size
+    test_loss /= size
     print('\nTest set: Average loss: {:.4f}, Accuracy: {}/{} ({:.2f}%)\n'.format(
-        test_loss, correct, len(test_data),
-        100. * correct / len(test_data)))
-    return test_loss,correct/len(test_data)
+        test_loss, correct, size,
+        100. * correct / size))
+    return test_loss,correct/size
 
 if __name__=='__main__':
     min_loss = 5000
