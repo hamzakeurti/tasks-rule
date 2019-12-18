@@ -9,20 +9,25 @@ class Encoder(nn.Module):
         self.conv3 = nn.Conv2d(128,256,3,padding = 3//2)
         self.conv4 = nn.Conv2d(256,512,3,padding = 3//2)
 
+        self.norm1=nn.BatchNorm2d(64)
+        self.norm2=nn.BatchNorm2d(128)
+        self.norm3=nn.BatchNorm2d(256)
+        self.norm4=nn.BatchNorm2d(512)
+
         self.pool = nn.MaxPool2d(3,padding = 3//2,stride = 2)
         self.relu = nn.ReLU()
         self.pool_final = nn.MaxPool2d(7)
     def forward(self,x):
-        x = self.pool(self.relu(self.conv1(x)))
+        x = self.pool(self.relu(self.norm1(self.conv1(x))))
         V1 = x
 
-        x = self.pool(self.relu(self.conv2(x)))
+        x = self.pool(self.relu(self.norm2(self.conv2(x))))
         V2 = x
 
-        x = self.pool(self.relu(self.conv3(x)))
+        x = self.pool(self.relu(self.norm3(self.conv3(x))))
         V4 = x
 
-        x = self.pool(self.relu(self.conv4(x)))
+        x = self.pool(self.relu(self.norm4(self.conv4(x))))
         IT = x
         
         x = self.pool_final(x)

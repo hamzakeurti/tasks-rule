@@ -32,8 +32,8 @@ args = parser.parse_args()
 train_dataset = Classification_dataset(args.dataset)
 test_dataset = Classification_dataset(args.dataset,mode="val")
 
-train_loader = DataLoader(train_dataset,batch_size=args.batch_size)
-test_loader = DataLoader(test_dataset,batch_size=args.batch_size)
+train_loader = DataLoader(train_dataset,batch_size=args.batch_size,shuffle=True)
+test_loader = DataLoader(test_dataset,batch_size=args.batch_size,shuffle=True)
 
 device = args.device
 kwargs = {'num_workers': 1, 'pin_memory': True}
