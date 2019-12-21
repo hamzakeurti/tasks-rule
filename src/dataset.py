@@ -43,6 +43,20 @@ class Classification_dataset(Dataset):
         image = ID_to_picture(self.data[idx])
         return image,self.labels[idx]
 
+class ReconstructionDataset(Dataset):
+    def __init__(self,pickle_file,mode="train"):
+        train,test = pickle_to_dataset(pickle_file)
+        if mode =="train":
+            self.data = train[0]
+        else:
+            self.data = test[0]
+        self.mode=mode
+    def __len__(self):
+        return len(self.data)
+        
+    def __getitem__(self,idx):
+        image = ID_to_picture(self.data[idx])
+        return image
 
 class Regression_dataset(Dataset):
     def __init__(self,pt_file):
