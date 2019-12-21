@@ -12,7 +12,7 @@ def pickle_to_dataset(pickle_file):
     train,test = d
     return train,test
 
-def ID_to_picture(image_id, task_idx):
+def ID_to_picture(image_id, task_idx=1):
     if task_idx == 2:
         image_path = "/data4/chenhaoran/{}".format(image_id)
     else:
