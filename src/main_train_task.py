@@ -64,7 +64,7 @@ def train(encoder,decoder, device, train_loader, optimizer, epoch):
         if args.multitask_mode ==0:
             loss = F.cross_entropy(output, target)
         else:
-            loss = F.binary_cross_entropy(output,target)
+            loss = F.binary_cross_entropy(F.sigmoid(output),target)
         loss.backward()
         optimizer.step()
         loss_list.append(loss.item())
