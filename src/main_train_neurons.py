@@ -1,6 +1,7 @@
 import torch
 from model import Encoder
 import argparse
+from dataset import Regression_dataset
 
 parser = argparse.ArgumentParser()
 
@@ -11,10 +12,13 @@ args = parser.parse_args()
 
 device = args.device
 
-stimuli = 0
+
 
 def state_to_fmap(state_dict_file):
     state_dict = torch.load(state_dict_file)
     model = Encoder().to(device)
-    return model(stimuli)
+    state = 0
+    return state
 
+pt_file = '/data3/valentin/dataset/images_fmri.pt'
+reg_dataset = Regression_dataset(pt_file)
