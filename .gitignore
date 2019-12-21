@@ -1,2 +1,4 @@
 __pycache__
+src/.ipynb_checkpoints/*
+.gitignore
 sftp-config.json

@@ -1,5 +1,6 @@
 import torch
 import torch.nn as nn
+import numpy as np
 
 class Encoder(nn.Module):
     def __init__(self):
@@ -41,3 +42,15 @@ class Classification_Decoder(nn.Module):
     def forward(self,x):
         x = self.linear(x)
         return x
+    
+
+class ReconstructionDecoder(nn.Module):
+    def __init__(self,in_features,image_shape):
+        super(ReconstructionDecoder,self).__init__()
+        self.linear = nn.Linear(in_features=in_features,out_features=np.prod(image_shape))
+        self.ouput_shape = image_shape
+        
+    def forward(self,code):
+        x_hat = self.linear(code)
+        x_hat = x_hat.view((-1,)+self.ouput_shape)
+        return x_hat
