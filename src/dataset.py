@@ -12,8 +12,11 @@ def pickle_to_dataset(pickle_file):
     train,test = d
     return train,test
 
-def ID_to_picture(image_id):
-    image_path = "/data4/chenhaoran/mscoco/{}2014/COCO_{}2014_{:012d}.jpg".format('train','train',image_id)
+def ID_to_picture(image_id, task_idx):
+    if task_idx == 2:
+        image_path = "/data4/chenhaoran/{}".format(image_id)
+    else:
+        image_path = "/data4/chenhaoran/mscoco/{}2014/COCO_{}2014_{:012d}.jpg".format('train','train',image_id)
     try:
         image = Image.open(image_path)
     except:
@@ -27,7 +30,7 @@ def ID_to_picture(image_id):
     return image
 
 class Classification_dataset(Dataset):
-    def __init__(self,pickle_file,mode="train"):
+    def __init__(self,pickle_file, task_idx, mode="train"):
         train,test = pickle_to_dataset(pickle_file)
         self.data = test[0]
         self.labels = test[1]
@@ -36,11 +39,13 @@ class Classification_dataset(Dataset):
             self.labels = train[1]
 
         self.mode=mode
+        self.task_idx = task_idx
+
     def __len__(self):
         return len(self.data)
         
     def __getitem__(self,idx):
-        image = ID_to_picture(self.data[idx])
+        image = ID_to_picture(self.data[idx], self.task_idx)
         return image,self.labels[idx]
 
 class ReconstructionDataset(Dataset):

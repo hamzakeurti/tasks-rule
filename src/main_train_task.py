@@ -12,6 +12,7 @@ import argparse
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--task_name",type=str,help="Name of the task for file naming purposes")
+parser.add_argument("--task_index",type=int,help="Index of the task")
 parser.add_argument("--dataset",type=str,help = "pickle file associated to the dataset",default = "data/single-class-classification-dataset.pkl")
 
 parser.add_argument("--device",type = str,default="cuda")
@@ -31,8 +32,8 @@ parser.add_argument("--multitask_mode",type=int,default=0)
 
 args = parser.parse_args()
 
-train_dataset = Classification_dataset(args.dataset)
-test_dataset = Classification_dataset(args.dataset,mode="val")
+train_dataset = Classification_dataset(args.dataset, args.task_index)
+test_dataset = Classification_dataset(args.dataset, args.task_index, mode="val")
 
 train_loader = DataLoader(train_dataset,batch_size=args.batch_size,shuffle=True)
 test_loader = DataLoader(test_dataset,batch_size=args.batch_size,shuffle=True)
