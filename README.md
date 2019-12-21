@@ -18,7 +18,18 @@ A study of the role of tasks in shaping visual processing
   - The dataset consists of 60, 000 images and twenty categories.
   - Pickle file organization structure = [dataset, label_description], dataset = [image id list, labels list], label description = {label: category name}.
   - image names: "./train2014/COCO_train2014_%012d.jpg" % (image_id) or "./val2014/COCO_val2014_%012d.jpg" % (image_id).
-
+- Task 4: Ten-class classification task: inanimate
+  - Images are from ImageNet.
+  - The dataset consists of 13,000 images and ten categories. Each category contains 1,300 images.
+  - The folder `task4` is in `/data4/chenhaoran` on img16.
+  - There are ten folders in the primary folder and the name of each folder is the category name.
+  - The pickle file for task4 is also in `/data4/chenhaoran` on img16.
+- Task 5: Ten-class classification task: animate
+  - Images are from ImageNet.
+  - The dataset consists of 15,600 images and ten categories.
+  - The folder `task5` is in `/data4/chenhaoran` on img16.
+  - There are ten folders in the primary folder and the name of each folder is the category name.
+  - The pickle file for task5 is also in `/data4/chenhaoran` on img16.
 # fMRI data:
 The [BOLD5000](https://bold5000.github.io/) dataset: fMRI responses of 4 subjects to 5254 images taken from COCO (2000 images), ImageNet (1916 images) and scene images (1000).
 
