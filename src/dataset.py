@@ -17,13 +17,15 @@ def ID_to_picture(image_id, task_idx):
         image_path = "/data4/chenhaoran/{}".format(image_id)
     else:
         image_path = "/data4/chenhaoran/mscoco/{}2014/COCO_{}2014_{:012d}.jpg".format('train','train',image_id)
-        image = Image.open(image_path)
-    img = cv2.imread('Stimuli/COCO/COCO_train2014_000000012795.jpg')
+    img = cv2.imread(image_path)
+    if type(img)!=np.ndarray:
+        image_path = "/data4/chenhaoran/mscoco/{}2014/COCO_{}2014_{:012d}.jpg".format('val','val',image_id)
+        img = cv2.imread(image_path)
     res = cv2.resize(img, dsize=(224, 224), interpolation=cv2.INTER_CUBIC)
-    image = np.ndarray.astype(image,np.float32)/255
-    image = np.swapaxes(x,0,2)
-    image = np.swapaxes(x,0,1)
-    return image
+    res = np.swapaxes(res,0,2)
+    res = np.swapaxes(res,1,2)
+    res = np.ndarray.astype(res,np.float32)/255
+    return res
 
 class Classification_dataset(Dataset):
     def __init__(self,pickle_file, task_idx, mode="train"):
