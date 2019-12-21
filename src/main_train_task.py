@@ -93,7 +93,10 @@ def test(encoder,decoder, device, test_loader):
             output = encoder(data)
             output = output[4].view(-1,args.Encoder_out)
             output = decoder(output)
-            test_loss += F.cross_entropy(output, target).item() # sum up batch loss
+            if args.multitask_mode ==0:
+                test_loss+= F.cross_entropy(output, target)
+            else:
+                test_loss+= F.binary_cross_entropy(output,target)
             pred = output.argmax(dim=1, keepdim=True) # get the index of the max log-probability
             correct += pred.eq(target.view_as(pred)).sum().item()
     size = len(test_loader) * args.batch_size
