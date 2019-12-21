@@ -9,6 +9,8 @@ from model import Encoder,ReconstructionDecoder
 from copy import deepcopy
 from dataset import ReconstructionDataset
 import argparse
+import os
+import matplotlib.pyplot as plt
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--task_name",type=str,help="Name of the task for file naming purposes")
@@ -98,6 +100,9 @@ def test(encoder,decoder, device, test_loader, max_iterations = None):
     return test_loss
 
 if __name__=='__main__':
+    save_subdir = f"saved_models/{args.task_name}-plots/"
+    if not os.path.exists(save_subdir):
+        os.mkdir(save_subdir)
     min_loss = 5000
     train_losses,test_losses = [],[]
     for epoch in range(1, args.EPOCHS + 1):
@@ -108,6 +113,25 @@ if __name__=='__main__':
         if test_loss<min_loss:
             min_loss = test_loss
             best_model = deepcopy(encoder)
+            best_decoder = deepcopy(decoder)
+        # Plot
+        for batch_idx, x in enumerate(test_loader):
+            x = x.to(device)
+            best_model.eval()
+            best_decoder.eval()
+            out = best_decoder(best_model(x))
+
+            fig , axes = plt.subplots(10,2,figsize=(10,40))
+            for i in range(10):
+                axes[i][0].imshow(np.moveaxis(x.detach().numpy()[i],0,-1))
+                axes[i][0].tick_params(labelbottom=False,labelleft=False,left=False,bottom=False)
+                axes[i][0].set_title('Original')
+                axes[i][1].imshow(np.moveaxis(out.detach().numpy()[i],0,-1))
+                axes[i][1].tick_params(labelbottom=False,labelleft=False,left=False,bottom=False)
+                axes[i][1].set_title('Reconstructed')
+            fig.savefig(f'{save_subdir}{epoch}.png')
+            fig.close()
+            break
     prefix = args.task_name
     np.save(prefix + '_test_losses.npy',test_losses)
     np.save(prefix + '_train_losses.npy',train_losses)
