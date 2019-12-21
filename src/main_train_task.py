@@ -93,7 +93,7 @@ def test(encoder,decoder, device, test_loader):
             output = encoder(data)
             output = output[4].view(-1,args.Encoder_out)
             output = decoder(output)
-            if args.multitask_mode ==0:
+            if args.multitask_mode ==0 :
                 test_loss+= F.cross_entropy(output, target)
             else:
                 test_loss+= F.binary_cross_entropy(output,target)

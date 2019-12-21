@@ -14,7 +14,11 @@ def pickle_to_dataset(pickle_file):
 
 def ID_to_picture(image_id):
     image_path = "/data4/chenhaoran/mscoco/{}2014/COCO_{}2014_{:012d}.jpg".format('train','train',image_id)
-    image = Image.open(image_path)
+    try:
+        image = Image.open(image_path)
+    except:
+        image_path = "/data4/chenhaoran/mscoco/{}2014/COCO_{}2014_{:012d}.jpg".format('val','val',image_id)
+        image = Image.open(image_path)
     image = asarray(image)
     image = np.resize(image,(224,224,3))
     image=np.swapaxes(image,0,2)
@@ -30,7 +34,7 @@ class Classification_dataset(Dataset):
         if mode =="train":
             self.data = train[0]
             self.labels = train[1]
-            
+
         self.mode=mode
     def __len__(self):
         return len(self.data)
