@@ -42,7 +42,7 @@ kwargs = {'num_workers': 1, 'pin_memory': True}
 
 
 encoder = Encoder().to(device)
-decoder = ReconstructionDecoder(args.Encoder_out,args.Decoder_out).to(device)
+decoder = ReconstructionDecoder(args.Encoder_out,args.image_shape).to(device)
 
 params = list(encoder.parameters()) + list(decoder.parameters())
 optimizer = optim.SGD(params, lr=args.learning_rate, momentum=args.momentum, weight_decay=args.weight_decay)

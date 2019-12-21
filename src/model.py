@@ -1,6 +1,6 @@
 import torch
 import torch.nn as nn
-
+import numpy as np
 class Encoder(nn.Module):
     def __init__(self):
         super(Encoder,self).__init__()
