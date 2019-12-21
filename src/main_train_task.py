@@ -56,20 +56,23 @@ def train(encoder,decoder, device, train_loader, optimizer, epoch):
     saved_loss_list = []
     saved_acc_list = []
     for batch_idx, (data, target) in enumerate(train_loader):
-        data, target = data.to(device), torch.tensor(target).type(torch.float).to(device)
+        data, target = data.to(device), torch.tensor(target).to(device)
+        if args.multitask_mode==1:
+                target = target.type(torch.float)
         optimizer.zero_grad()
         output = encoder(data)
         output = output[4].view(-1,args.Encoder_out)
         output = decoder(output)
         if args.multitask_mode ==0:
             loss = F.cross_entropy(output, target)
+            pred = output.argmax(dim=1, keepdim=True) # get the index of the max log-probability
+            acc = pred.eq(target.view_as(pred)).float().mean()
         else:
             loss = F.binary_cross_entropy_with_logits(output,target)
+            acc=torch.tensor([0])
         loss.backward()
         optimizer.step()
         loss_list.append(loss.item())
-        pred = output.argmax(dim=1, keepdim=True) # get the index of the max log-probability
-        acc = pred.eq(target.view_as(pred)).float().mean()
         acc_list.append(acc.item())
         if batch_idx % args.LOG_INTERVAL == 0:
             msg = 'Train Epoch: {} [{}/{} ({:.0f}%)]\tAvg Loss: {:.4f}\tAvg Acc: {:.4f}'.format(
@@ -90,16 +93,18 @@ def test(encoder,decoder, device, test_loader):
     correct = 0
     with torch.no_grad():
         for batch_idx, (data, target) in enumerate(test_loader):
-            data, target = data.to(device), torch.tensor(target).type(torch.float).to(device)
+            data, target = data.to(device), torch.tensor(target).to(device)
+            if args.multitask_mode==1:
+                target = target.type(torch.float)
             output = encoder(data)
             output = output[4].view(-1,args.Encoder_out)
             output = decoder(output)
             if args.multitask_mode ==0 :
                 test_loss+= F.cross_entropy(output, target)
+                pred = output.argmax(dim=1, keepdim=True) # get the index of the max log-probability
+                correct += pred.eq(target.view_as(pred)).sum().item()
             else:
                 test_loss+= F.binary_cross_entropy_with_logits(output,target)
-            pred = output.argmax(dim=1, keepdim=True) # get the index of the max log-probability
-            correct += pred.eq(target.view_as(pred)).sum().item()
     size = len(test_loader) * args.batch_size
     test_loss /= size
     print('\nTest set: Average loss: {:.4f}, Accuracy: {}/{} ({:.2f}%)\n'.format(
