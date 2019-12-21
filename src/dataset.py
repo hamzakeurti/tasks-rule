@@ -13,6 +13,8 @@ def pickle_to_dataset(pickle_file):
 
 def ID_to_picture(image_id):
     image_path = "/data4/chenhaoran/mscoco/train2014/COCO_train2014_%012d.jpg" % (image_id)
+    if not os.path.exists(image_path):
+        image_path = "/data4/chenhaoran/mscoco/val2014/COCO_val2014_%012d.jpg" % (image_id)
     image = Image.open(image_path)
     image = asarray(image)
     image = np.resize(image,(224,224,3))
