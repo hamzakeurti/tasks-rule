@@ -112,8 +112,8 @@ if __name__=='__main__':
             min_loss = test_loss
             best_model = deepcopy(encoder)
     prefix = args.task_name
-    np.save(prefix + 'test_losses.npy',test_losses)
-    np.save(prefix + 'train_losses.npy',train_losses)
-    np.save(prefix + 'test_accs.npy',test_accs)
-    np.save(prefix + 'train_accs.npy',train_accs)
+    np.save(prefix + '_test_losses.npy',test_losses)
+    np.save(prefix + '_train_losses.npy',train_losses)
+    np.save(prefix + '_test_accs.npy',test_accs)
+    np.save(prefix + '_train_accs.npy',train_accs)
     torch.save(best_model.state_dict(),"saved_models/"+args.task_name+".pth")
