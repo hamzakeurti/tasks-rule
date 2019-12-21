@@ -12,8 +12,6 @@ args = parser.parse_args()
 
 device = args.device
 
-
-
 def state_to_fmap(state_dict_file):
     state_dict = torch.load(state_dict_file)
     model = Encoder().to(device)
