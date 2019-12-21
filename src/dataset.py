@@ -5,6 +5,7 @@ from PIL import Image
 from numpy import asarray
 import numpy as np
 import torch
+import cv2
 
 def pickle_to_dataset(pickle_file):
     data = open(pickle_file,"rb")
@@ -17,13 +18,9 @@ def ID_to_picture(image_id, task_idx):
         image_path = "/data4/chenhaoran/{}".format(image_id)
     else:
         image_path = "/data4/chenhaoran/mscoco/{}2014/COCO_{}2014_{:012d}.jpg".format('train','train',image_id)
-        image = Image.open(image_path)
-    image = asarray(image)
-    image = np.resize(image,(224,224,3))
-    image=np.swapaxes(image,0,2)
-    image = np.swapaxes(image,1,2)
-    image = np.ndarray.astype(image,np.float32)/255
-    return image
+        img = cv2.imread(image_path)
+    res = cv2.resize(img, dsize=(224, 224), interpolation=cv2.INTER_CUBIC)/255
+    return res
 
 class Classification_dataset(Dataset):
     def __init__(self,pickle_file, task_idx, mode="train"):
