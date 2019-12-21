@@ -27,6 +27,8 @@ parser.add_argument("--weight_decay",type=float,default=0.)
 parser.add_argument("--Encoder_out",type=int,default=512)
 parser.add_argument("--Decoder_out",type=int,default=10)
 
+parser.add_argument("--multitask_mode",type=int,default=0)
+
 args = parser.parse_args()
 
 train_dataset = Classification_dataset(args.dataset)
@@ -53,12 +55,15 @@ def train(encoder,decoder, device, train_loader, optimizer, epoch):
     saved_loss_list = []
     saved_acc_list = []
     for batch_idx, (data, target) in enumerate(train_loader):
-        data, target = data.to(device), target.to(device)
+        data, target = data.to(device), torch.tensor(target).to(device)
         optimizer.zero_grad()
         output = encoder(data)
         output = output[4].view(-1,args.Encoder_out)
         output = decoder(output)
-        loss = F.cross_entropy(output, target)
+        if args.multitask_mode ==0:
+            loss = F.cross_entropy(output, target)
+        else:
+            loss = F.binary_cross_entropy(output,target)
         loss.backward()
         optimizer.step()
         loss_list.append(loss.item())
@@ -84,7 +89,7 @@ def test(encoder,decoder, device, test_loader):
     correct = 0
     with torch.no_grad():
         for batch_idx, (data, target) in enumerate(test_loader):
-            data, target = data.to(device), target.to(device)
+            data, target = data.to(device), torch.tensor(target).to(device)
             output = encoder(data)
             output = output[4].view(-1,args.Encoder_out)
             output = decoder(output)

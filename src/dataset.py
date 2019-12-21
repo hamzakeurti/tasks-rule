@@ -22,7 +22,6 @@ def ID_to_picture(image_id):
     image = np.ndarray.astype(image,np.float32)/255
     return image
 
-
 class Classification_dataset(Dataset):
     def __init__(self,pickle_file,mode="train"):
         train,test = pickle_to_dataset(pickle_file)
@@ -39,6 +38,7 @@ class Classification_dataset(Dataset):
     def __getitem__(self,idx):
         image = ID_to_picture(self.data[idx])
         return image,self.labels[idx]
+
 
 class Regression_dataset(Dataset):
     def __init__(self,pt_file):
