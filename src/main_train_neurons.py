@@ -34,7 +34,17 @@ device = args.device
 pt_file = '/dev/shm/images_fmri.pt'
 
 #['LHRSC', 'LHEarlyVis', 'RHEarlyVis', 'LHOPA', 'RHRSC', 'LHLOC', 'RHLOC', 'RHOPA', 'LHPPA', 'RHPPA', 'All']
-ROIs = torch.load('/data3/valentin/datasets/ROIs.pt')
+ROIs = torch.load('/dev/shm/ROIs.pt')
+for e in ROIs:
+    if 'RHRRSC' in e:
+        e['RHRSC'] = e['RHRRSC']
+        del e['RHRRSC']
+    if 'RHLO' in e:
+        e['RHLOC'] = e['RHLO']
+        del e['RHLO']
+    if 'LHLO' in e:
+        e['LHLOC'] = e['LHLO']
+        del e['LHLO']
 ROI_mask = np.ones(4438)
 if args.ROI!="All":
     joined_ROI = [np.zeros(np.sum(ROIs[sub]['All']>=1)) for sub in range(3)]
@@ -42,8 +52,6 @@ if args.ROI!="All":
         if args.ROI in ROI_name:
             for sub in range(3):
                 name = ROI_name
-                if sub>0 and ROI_name[-2:]=='OC':
-                    name = ROI_name[:-1]
                 joined_ROI[sub] = joined_ROI[sub] + ROIs[sub][name][ROIs[sub]['All']>=1]
 
     ROI_mask = np.concatenate(joined_ROI)
