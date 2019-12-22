@@ -99,7 +99,7 @@ def test(reg_model, device, test_loader):
     size = 0
     with torch.no_grad():
         for batch_idx, (fmap, target) in enumerate(test_loader):
-            fmap,  = torch.cat([x.view(args.batch_size,-1) for x in fmap[args.starting_layer:args.ending_layer+1]],1).to(device)
+            fmap = torch.cat([x.view(args.batch_size,-1) for x in fmap[args.starting_layer:args.ending_layer+1]],1).to(device)
             target = target.t()[ROI_mask>0].t().clone().detach().to(device).type(torch.float)
             output = reg_model(fmap)
             test_loss+= F.mse_loss(output, target)
