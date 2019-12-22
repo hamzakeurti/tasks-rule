@@ -54,7 +54,7 @@ optimizer = optim.Adam(reg_model.parameters(), lr=args.learning_rate, weight_dec
 device='cpu'
 
 def train(reg_model, device, train_loader, optimizer, epoch):
-    encoder.train()
+    reg_model.train()
     loss_list = []
     saved_loss_list = []
     for batch_idx, (fmap, target) in enumerate(train_loader):
@@ -77,7 +77,7 @@ def train(reg_model, device, train_loader, optimizer, epoch):
 
 
 def test(reg_model, device, test_loader):
-    encoder.eval()
+    reg_model.eval()
     test_loss = 0
     with torch.no_grad():
         for batch_idx, (fmap, target) in enumerate(test_loader):
