@@ -14,12 +14,12 @@ def pickle_to_dataset(pickle_file):
 
 def ID_to_picture(image_id, task_idx=1):
     if task_idx in {2, 4, 5}:
-        image_path = "/data4/chenhaoran/{}".format(image_id)
+        image_path = "/dev/shm/{}".format(image_id)
     else:
-        image_path = "/data4/chenhaoran/mscoco/{}2014/COCO_{}2014_{:012d}.jpg".format('train','train',image_id)
+        image_path = "/dev/shm/mscoco/{}2014/COCO_{}2014_{:012d}.jpg".format('train','train',image_id)
     img = cv2.imread(image_path)
     if type(img)!=np.ndarray:
-        image_path = "/data4/chenhaoran/mscoco/{}2014/COCO_{}2014_{:012d}.jpg".format('val','val',image_id)
+        image_path = "/dev/shm/mscoco/{}2014/COCO_{}2014_{:012d}.jpg".format('val','val',image_id)
         img = cv2.imread(image_path)
     res = cv2.resize(img, dsize=(224, 224), interpolation=cv2.INTER_CUBIC)
     res = np.swapaxes(res,0,2)

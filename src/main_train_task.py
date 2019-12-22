@@ -113,7 +113,7 @@ def test(encoder,decoder, device, test_loader):
     with torch.no_grad():
         for batch_idx, (data, target) in enumerate(test_loader):
             data, target = data.to(device), target.clone().detach().to(device)
-            if args.task_index == 2:
+            if args.task_index == 3:
                 target = target.type(torch.float)
             output = encoder(data)
             output = output[4].view(-1,args.Encoder_out)
@@ -132,7 +132,7 @@ def test(encoder,decoder, device, test_loader):
     return test_loss,correct/size
 
 if __name__=='__main__':
-    min_loss = 5000
+    max_acc = 0.
     train_losses,train_accs,test_losses,test_accs = [],[],[],[]
     for epoch in range(1, args.EPOCHS + 1):
         train_loss, train_acc = train(encoder,decoder, device, train_loader, optimizer, epoch)
@@ -141,12 +141,12 @@ if __name__=='__main__':
         train_accs.extend(train_acc)
         test_losses.append(test_loss)
         test_accs.append(test_acc)
-        if test_loss<min_loss:
-            min_loss = test_loss
-            best_model = deepcopy(encoder)
+        if test_acc > max_acc:
+            max_acc = test_acc
+            torch.save(encoder.state_dict(),"saved_models/"+args.task_name+".pth")
+
     prefix = args.task_name
     np.save(prefix + '_test_losses.npy',test_losses)
     np.save(prefix + '_train_losses.npy',train_losses)
     np.save(prefix + '_test_accs.npy',test_accs)
     np.save(prefix + '_train_accs.npy',train_accs)
-    torch.save(best_model.state_dict(),"saved_models/"+args.task_name+".pth")
