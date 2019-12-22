@@ -78,15 +78,20 @@ def train(reg_model, device, train_loader, optimizer, epoch):
 def test(reg_model, device, test_loader):
     reg_model.eval()
     test_loss = 0
+    targets,outputs=[],[]
     with torch.no_grad():
         for batch_idx, (fmap, target) in enumerate(test_loader):
             fmap, target = torch.cat([x.view(args.batch_size,-1) for x in fmap[args.starting_layer:args.ending_layer+1]],1).to(device), target.clone().detach().to(device).type(torch.float)
             output = reg_model(fmap)
             test_loss+= F.mse_loss(output, target)
+            targets.append(np.array(target.clone().detach().cpu()))
+            outputs.append(np.array(output.clone().detach().cpu()))
+    targets,outputs = np.concatenate((targets)),np.concatenate((outputs))
+    EV = 1 - np.var(targets-outputs)/np.var(targets)
     size = len(test_loader) * args.batch_size
     test_loss /= size
-    print('\nTest set: Average loss: {:.4f}\n'.format(
-        test_loss))
+    print('\nTest set: Average loss: {:.4f}, EV= {:.4f}\n'.format(
+        test_loss,EV))
     return test_loss
 
 
