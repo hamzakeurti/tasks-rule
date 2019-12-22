@@ -2,8 +2,8 @@ import pickle
 import os
 from torch.utils.data import Dataset, DataLoader
 from PIL import Image
-from numpy import asarray
 import numpy as np
+from numpy import asarray
 import torch
 import cv2
 

@@ -4,12 +4,12 @@ import torch.nn.functional as F
 import torch.optim as optim
 import numpy as np
 from torch.utils.data import DataLoader
-from utils import LOG_INFO
-from model import Encoder,Classification_Decoder
-from copy import deepcopy
-from dataset import ClassificationDataset
 import argparse
 from sklearn.metrics import average_precision_score
+
+from dataset import ClassificationDataset
+from model import Encoder,Classification_Decoder
+from utils import LOG_INFO
 
 
 parser = argparse.ArgumentParser()
@@ -110,6 +110,7 @@ def test(encoder,decoder, device, test_loader):
     decoder.eval()
     test_loss = 0
     correct = 0
+    outputs, targets = [], []
     with torch.no_grad():
         for batch_idx, (data, target) in enumerate(test_loader):
             data, target = data.to(device), target.clone().detach().to(device)
@@ -124,12 +125,23 @@ def test(encoder,decoder, device, test_loader):
                 correct += pred.eq(target.view_as(pred)).sum().item()
             else:
                 test_loss+= F.binary_cross_entropy_with_logits(output,target)
+                outputs.append(output.cpu().detach().numpy())
+                targets.append(target.cpu().detach().numpy())
     size = len(test_loader) * args.batch_size
     test_loss /= size
-    print('\nTest set: Average loss: {:.4f}, Accuracy: {}/{} ({:.2f}%)\n'.format(
-        test_loss, correct, size,
-        100. * correct / size))
-    return test_loss,correct/size
+    if args.task_index in  [1, 2, 4, 5]:
+        acc = correct / size
+        print('\nTest set: Average loss: {:.4f}, Accuracy: {}/{} ({:.2f}%)\n'.format(
+            test_loss, correct, size, 100. * acc))
+    else:
+        y_score = np.concatenate(outputs, axis=0)
+        y_true = np.concatenate(targets, axis=0)
+        average_precision = average_precision_score(y_true, y_score)
+        print('\nTest set: Average loss: {:.4f}, Average Precision: {:.2f}%\n'.format(
+            test_loss, average_precision))
+        acc = average_precision
+
+    return test_loss, acc
 
 if __name__=='__main__':
     max_acc = 0.
