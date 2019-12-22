@@ -112,7 +112,7 @@ def test(encoder,decoder, device, test_loader):
     correct = 0
     with torch.no_grad():
         for batch_idx, (data, target) in enumerate(test_loader):
-            data, target = data.to(device), torch.tensor(target).to(device)
+            data, target = data.to(device), target.clone().detach().to(device)
             if args.task_index == 2:
                 target = target.type(torch.float)
             output = encoder(data)
