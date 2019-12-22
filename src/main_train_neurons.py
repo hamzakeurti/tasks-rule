@@ -51,7 +51,6 @@ reg_model = RegressionDecoder(args.starting_layer,args.ending_layer)
 
 optimizer = optim.Adam(reg_model.parameters(), lr=args.learning_rate, weight_decay=args.weight_decay, amsgrad=True)
 
-device='cpu'
 
 def train(reg_model, device, train_loader, optimizer, epoch):
     reg_model.train()
