@@ -28,7 +28,7 @@ parser.add_argument("--device",type = str,default="cpu")
 args = parser.parse_args()
 
 
-
+device = args.device
 pt_file = '/data3/valentin/datasets/images_fmri.pt'
 pt_file = '/dev/shm/images_fmri.pt'
 
@@ -47,7 +47,7 @@ train_loader,test_loader = DataLoader(train_dataset,batch_size=args.batch_size,s
 
 
 
-reg_model = RegressionDecoder(args.starting_layer,args.ending_layer)
+reg_model = RegressionDecoder(args.starting_layer,args.ending_layer).to(device)
 
 optimizer = optim.Adam(reg_model.parameters(), lr=args.learning_rate, weight_decay=args.weight_decay, amsgrad=True)
 
