@@ -119,8 +119,9 @@ if __name__=='__main__':
             x = x.to(device)
             best_model.eval()
             best_decoder.eval()
-            out = best_decoder(best_model(x))
-
+            out = best_model(x)
+            out = out[4].view(-1,args.Encoder_out)
+            out = best_decoder(out)
             fig , axes = plt.subplots(10,2,figsize=(10,40))
             for i in range(10):
                 axes[i][0].imshow(np.moveaxis(x.detach().numpy()[i],0,-1))
