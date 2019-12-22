@@ -64,11 +64,12 @@ def train(reg_model, device, train_loader, optimizer, epoch):
         loss_list.append(loss.item())
 
         if batch_idx % args.LOG_INTERVAL == 0:
+            loss_list_avg = np.sum(loss_list) / len(loss_list)
             msg = 'Train Epoch: {} [{}/{} ({:.0f}%)]\tAvg Loss: {:.4f}'.format(
                     epoch, batch_idx * len(fmap), len(train_loader.dataset),
-                    100. * batch_idx / len(train_loader), np.mean(loss_list))
+                    100. * batch_idx / len(train_loader), loss_list_avg)
             LOG_INFO(msg)
-            saved_loss_list.append(np.mean(loss_list))
+            saved_loss_list.append(loss_list_avg)
             loss_list.clear()
     return saved_loss_list
 
@@ -77,16 +78,18 @@ def test(reg_model, device, test_loader):
     reg_model.eval()
     test_loss = 0
     targets,outputs=[],[]
+    size = 0
     with torch.no_grad():
         for batch_idx, (fmap, target) in enumerate(test_loader):
-            fmap, target = torch.cat([x.view(args.batch_size,-1) for x in fmap[args.starting_layer:args.ending_layer+1]],1).to(device), target.clone().detach().to(device).type(torch.float)
+            fmap = torch.cat([x.view(args.batch_size,-1) for x in fmap[args.starting_layer:args.ending_layer+1]],1).to(device)
+            target = target.clone().detach().to(device).type(torch.float)
             output = reg_model(fmap)
             test_loss+= F.mse_loss(output, target)
             targets.append(np.array(target.clone().detach().cpu()))
             outputs.append(np.array(output.clone().detach().cpu()))
+            size += 1
     targets,outputs = np.concatenate((targets)),np.concatenate((outputs))
     EV = 1 - np.var(targets-outputs)/np.var(targets)
-    size = len(test_loader) * args.batch_size
     test_loss /= size
     print('\nTest set: Average loss: {:.4f}, EV= {:.4f}\n'.format(
         test_loss,EV))
