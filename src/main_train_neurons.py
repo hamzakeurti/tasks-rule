@@ -24,6 +24,7 @@ parser.add_argument("--ending_layer",type=int,default=3)
 parser.add_argument("--learning_rate",type=float,default=0.01)
 parser.add_argument("--weight_decay",type=float,default=0.)
 
+parser.add_argument("--device",type = str,default="cpu")
 args = parser.parse_args()
 
 
