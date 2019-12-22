@@ -14,7 +14,7 @@ parser = argparse.ArgumentParser()
 
 parser.add_argument("--task_name",type=str,help="Name of the task for file naming purposes")
 parser.add_argument("--state_dict_file",type = str)
-parser.add_argument("--batch_size",type=int,default=50)
+parser.add_argument("--batch_size",type=int,default=100)
 parser.add_argument("--LOG_INTERVAL",type=int,default=50)
 parser.add_argument("--EPOCHS",type=int,default=10)
 
@@ -30,6 +30,7 @@ args = parser.parse_args()
 
 
 pt_file = '/data3/valentin/datasets/images_fmri.pt'
+pt_file = '/dev/shm/images_fmri.pt'
 
 
 encoder = Encoder()
@@ -42,7 +43,7 @@ torch.manual_seed(0)
 lengths = [int(len(reg_dataset)*0.8), len(reg_dataset)-int(len(reg_dataset)*0.8)]
 train_dataset, test_dataset = random_split(reg_dataset, lengths)
 
-train_loader,test_loader = DataLoader(train_dataset,batch_size=args.batch_size,shuffle=True),DataLoader(test_dataset,batch_size=args.batch_size,shuffle=True)
+train_loader,test_loader = DataLoader(train_dataset,batch_size=args.batch_size,shuffle=True,drop_last=True),DataLoader(test_dataset,batch_size=args.batch_size,shuffle=True,drop_last=True)
 
 
 
@@ -72,7 +73,6 @@ def train(reg_model, device, train_loader, optimizer, epoch):
             LOG_INFO(msg)
             saved_loss_list.append(np.mean(loss_list))
             loss_list.clear()
-
     return saved_loss_list
 
 
