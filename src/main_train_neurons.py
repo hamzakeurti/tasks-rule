@@ -25,12 +25,28 @@ parser.add_argument("--learning_rate",type=float,default=0.01)
 parser.add_argument("--weight_decay",type=float,default=0.)
 
 parser.add_argument("--device",type = str,default="cpu")
+
+parser.add_argument("--ROI",type=str,default="All")
 args = parser.parse_args()
 
 
 device = args.device
 pt_file = '/dev/shm/images_fmri.pt'
 
+#['LHRSC', 'LHEarlyVis', 'RHEarlyVis', 'LHOPA', 'RHRSC', 'LHLOC', 'RHLOC', 'RHOPA', 'LHPPA', 'RHPPA', 'All']
+ROIs = torch.load('/data3/valentin/datasets/ROIs.pt')
+ROI_mask = np.ones(4438)
+if args.ROI!="All":
+    joined_ROI = [np.zeros(np.sum(ROIs[sub]['All']>=1)) for sub in range(3)]
+    for ROI_name in ROIs[0].keys():
+        if args.ROI in ROI_name:
+            for sub in range(3):
+                name = ROI_name
+                if sub>0 and ROI_name[-2:]=='OC':
+                    name = ROI_name[:-1]
+                joined_ROI[sub] = joined_ROI[sub] + ROIs[sub][name][ROIs[sub]['All']>=1]
+
+    ROI_mask = np.concatenate(joined_ROI)
 
 encoder = Encoder()
 encoder.load_state_dict(torch.load(args.state_dict_file))
@@ -44,7 +60,9 @@ train_dataset, test_dataset = random_split(reg_dataset, lengths)
 
 train_loader = DataLoader(train_dataset,batch_size=args.batch_size,shuffle=True,drop_last=True)
 test_loader = DataLoader(test_dataset,batch_size=args.batch_size,shuffle=True,drop_last=True)
-reg_model = RegressionDecoder(args.starting_layer,args.ending_layer).to(device)
+
+dim_out = np.sum(ROI_mask>0)
+reg_model = RegressionDecoder(args.starting_layer,args.ending_layer,dim_out).to(device)
 
 optimizer = optim.Adam(reg_model.parameters(), lr=args.learning_rate, weight_decay=args.weight_decay, amsgrad=True)
 
@@ -55,7 +73,7 @@ def train(reg_model, device, train_loader, optimizer, epoch):
     saved_loss_list = []
     for batch_idx, (fmap, target) in enumerate(train_loader):
         fmap = torch.cat([x.view(args.batch_size,-1) for x in fmap[args.starting_layer:args.ending_layer+1]],1).to(device)
-        target = target.clone().detach().to(device).type(torch.float)
+        target = target.t()[ROI_mask>0].t().clone().detach().to(device).type(torch.float)
         optimizer.zero_grad()
         output = reg_model(fmap)
         loss = F.mse_loss(output, target)
@@ -79,7 +97,7 @@ def test(reg_model, device, test_loader):
     targets,outputs=[],[]
     with torch.no_grad():
         for batch_idx, (fmap, target) in enumerate(test_loader):
-            fmap, target = torch.cat([x.view(args.batch_size,-1) for x in fmap[args.starting_layer:args.ending_layer+1]],1).to(device), target.clone().detach().to(device).type(torch.float)
+            fmap, target = torch.cat([x.view(args.batch_size,-1) for x in fmap[args.starting_layer:args.ending_layer+1]],1).to(device), target.t()[ROI_mask>0].t().clone().detach().to(device).type(torch.float)
             output = reg_model(fmap)
             test_loss+= F.mse_loss(output, target)
             targets.append(np.array(target.clone().detach().cpu()))
