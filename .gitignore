@@ -2,3 +2,7 @@ __pycache__
 src/.ipynb_checkpoints/*
 .gitignore
 sftp-config.json
+*.pth
+*.npy
+*.log
+*.sh
