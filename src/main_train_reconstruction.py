@@ -131,7 +131,6 @@ if __name__=='__main__':
                 axes[i][1].tick_params(labelbottom=False,labelleft=False,left=False,bottom=False)
                 axes[i][1].set_title('Reconstructed')
             fig.savefig(f'{save_subdir}{epoch}.png')
-            fig.close()
             break
     prefix = args.task_name
     np.save(prefix + '_test_losses.npy',test_losses)
