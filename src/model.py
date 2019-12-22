@@ -18,6 +18,7 @@ class Encoder(nn.Module):
         self.pool = nn.MaxPool2d(3,padding = 3//2,stride = 2)
         self.relu = nn.ReLU()
         self.pool_final = nn.MaxPool2d(7)
+        self.downsample=nn.AvgPool2d(8,stride=2,padding=3)
     def forward(self,x):
         x = self.pool(self.relu(self.norm1(self.conv1(x))))
         V1 = x
@@ -32,7 +33,7 @@ class Encoder(nn.Module):
         IT = x
         
         x = self.pool_final(x)
-        return V1,V2,V4,IT,x
+        return self.downsample(V1),self.downsample(V2),V4,IT,x
 
 class Classification_Decoder(nn.Module):
     # Same model for single class and multi-class classification, just change the loss function
@@ -58,7 +59,7 @@ class ReconstructionDecoder(nn.Module):
 class RegressionDecoder(nn.Module):
     def __init__(self,starting_layer,ending_layer):
         super(RegressionDecoder,self).__init__()
-        sizes = [64*56*56,128*28*28,256*14*14,512*7*7,512]
+        sizes = [64*28*28,128*14*14,256*14*14,512*7*7,512]
         self.linear = nn.Linear(in_features = sum(sizes[starting_layer:ending_layer+1]) ,out_features = 4438)
     def forward(self,fmap):
         out = self.linear(fmap)
