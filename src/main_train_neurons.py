@@ -11,7 +11,7 @@ args = parser.parse_args()
 
 
 
-pt_file = '/data3/valentdin/dataset/images_fmri.pt'
+pt_file = '/data3/valentin/dataset/images_fmri.pt'
 
 
 encoder = Encoder()
