@@ -7,7 +7,7 @@ from torch.utils.data import DataLoader
 from utils import LOG_INFO
 from model import Encoder,Classification_Decoder
 from copy import deepcopy
-from dataset import Classification_dataset
+from dataset import ClassificationDataset
 import argparse
 from sklearn.metrics import average_precision_score
 
@@ -32,8 +32,8 @@ parser.add_argument("--Decoder_out",type=int,default=10)
 
 args = parser.parse_args()
 
-train_dataset = Classification_dataset(args.dataset, args.task_index)
-test_dataset = Classification_dataset(args.dataset, args.task_index, mode="val")
+train_dataset = ClassificationDataset(args.dataset, args.task_index)
+test_dataset = ClassificationDataset(args.dataset, args.task_index, mode="val")
 
 train_loader = DataLoader(train_dataset,batch_size=args.batch_size,shuffle=True)
 test_loader = DataLoader(test_dataset,batch_size=args.batch_size,shuffle=True)

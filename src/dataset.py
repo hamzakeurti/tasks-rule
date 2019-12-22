@@ -6,6 +6,7 @@ from numpy import asarray
 import numpy as np
 import torch
 import cv2
+
 def pickle_to_dataset(pickle_file):
     data = open(pickle_file,"rb")
     d = pickle.load(data)
@@ -27,7 +28,7 @@ def ID_to_picture(image_id, task_idx=1):
     res = np.ndarray.astype(res,np.float32)/255
     return res
 
-class Classification_dataset(Dataset):
+class ClassificationDataset(Dataset):
     def __init__(self,pickle_file, task_idx, mode="train"):
         train,test = pickle_to_dataset(pickle_file)
         self.data = test[0]
@@ -61,13 +62,14 @@ class ReconstructionDataset(Dataset):
         image = ID_to_picture(self.data[idx])
         return image
 
-class Regression_dataset(Dataset):
-    def __init__(self,pt_file):
+class RegressionDataset(Dataset):
+    def __init__(self,pt_file,encoder):
         self.data = torch.load(pt_file)
         #Data is a list of [image_name,image_array,fMRI_array]
-
+        self.encoder = encoder
     def __len__(self):
         return len(self.images)
     
     def __getitem__(self,idx):
-        return self.data[idx]
+        img = torch.tensor(self.data[idx][1]).unsqueeze(0)
+        return encoder(img),self.data[idx][2]

@@ -119,18 +119,18 @@ if __name__=='__main__':
             x = x.to(device)
             best_model.eval()
             best_decoder.eval()
-            out = best_decoder(best_model(x))
-
+            out = best_model(x)
+            out = out[4].view(-1,args.Encoder_out)
+            out = best_decoder(out)
             fig , axes = plt.subplots(10,2,figsize=(10,40))
             for i in range(10):
-                axes[i][0].imshow(np.moveaxis(x.detach().numpy()[i],0,-1))
+                axes[i][0].imshow(np.moveaxis(x.cpu().detach().numpy()[i],0,-1))
                 axes[i][0].tick_params(labelbottom=False,labelleft=False,left=False,bottom=False)
                 axes[i][0].set_title('Original')
-                axes[i][1].imshow(np.moveaxis(out.detach().numpy()[i],0,-1))
+                axes[i][1].imshow(np.moveaxis(out.cpu().detach().numpy()[i],0,-1))
                 axes[i][1].tick_params(labelbottom=False,labelleft=False,left=False,bottom=False)
                 axes[i][1].set_title('Reconstructed')
             fig.savefig(f'{save_subdir}{epoch}.png')
-            fig.close()
             break
     prefix = args.task_name
     np.save(prefix + '_test_losses.npy',test_losses)
