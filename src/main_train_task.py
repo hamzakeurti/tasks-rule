@@ -57,7 +57,7 @@ def train(encoder,decoder, device, train_loader, optimizer, epoch):
     saved_loss_list = []
     saved_acc_list = []
     for batch_idx, (data, target) in enumerate(train_loader):
-        data, target = data.to(device), torch.tensor(target).to(device)
+        data, target = data.to(device), target.clone().detach().to(device)
         if args.task_index == 3:
                 target = target.type(torch.float)
         optimizer.zero_grad()
@@ -71,8 +71,8 @@ def train(encoder,decoder, device, train_loader, optimizer, epoch):
             acc_list.append(acc.item())
         else:
             loss = F.binary_cross_entropy_with_logits(output,target)
-            outputs.append(output.cpu().numpy())
-            targets.append(target.cpu().numpy())
+            outputs.append(output.cpu().detach().numpy())
+            targets.append(target.cpu().detach().numpy())
         loss.backward()
         optimizer.step()
         loss_list.append(loss.item())
@@ -113,12 +113,12 @@ def test(encoder,decoder, device, test_loader):
     with torch.no_grad():
         for batch_idx, (data, target) in enumerate(test_loader):
             data, target = data.to(device), torch.tensor(target).to(device)
-            if args.multitask_mode==1:
+            if args.task_index == 2:
                 target = target.type(torch.float)
             output = encoder(data)
             output = output[4].view(-1,args.Encoder_out)
             output = decoder(output)
-            if args.multitask_mode ==0 :
+            if args.task_index in [1, 2, 4, 5]:
                 test_loss+= F.cross_entropy(output, target)
                 pred = output.argmax(dim=1, keepdim=True) # get the index of the max log-probability
                 correct += pred.eq(target.view_as(pred)).sum().item()
