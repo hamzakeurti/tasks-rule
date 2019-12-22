@@ -92,6 +92,7 @@ def test(reg_model, device, test_loader):
 
 if __name__=='__main__':
     min_loss = 5000
+    print(reg_model)
     train_losses,train_accs,test_losses,test_accs = [],[],[],[]
     for epoch in range(1, args.EPOCHS + 1):
         train_loss= train(reg_model, device, train_loader, optimizer, epoch)
@@ -106,4 +107,4 @@ if __name__=='__main__':
     np.save(prefix + '_train_losses.npy',train_losses)
     np.save(prefix + '_test_accs.npy',test_accs)
     np.save(prefix + '_train_accs.npy',train_accs)
-    torch.save(best_model.state_dict(),"saved_models/"+args.task_name+".pth")
+    torch.save(best_model.state_dict(),"saved_models/"+args.task_name+"_reg_model.pth")
