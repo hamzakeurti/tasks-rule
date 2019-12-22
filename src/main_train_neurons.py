@@ -36,7 +36,7 @@ encoder = Encoder()
 encoder.load_state_dict(torch.load(args.state_dict_file))
 encoder.eval()
 
-reg_dataset = RegressionDataset(pt_file,encoder)
+reg_dataset = RegressionDataset(pt_file, encoder, device)
 
 torch.manual_seed(0)
 lengths = [int(len(reg_dataset)*0.8), len(reg_dataset)-int(len(reg_dataset)*0.8)]
@@ -54,7 +54,8 @@ def train(reg_model, device, train_loader, optimizer, epoch):
     loss_list = []
     saved_loss_list = []
     for batch_idx, (fmap, target) in enumerate(train_loader):
-        fmap, target = torch.cat([x.view(args.batch_size,-1) for x in fmap[args.starting_layer:args.ending_layer+1]],1).to(device), target.clone().detach().to(device).type(torch.float)
+        fmap = torch.cat([x.view(args.batch_size,-1) for x in fmap[args.starting_layer:args.ending_layer+1]],1).to(device)
+        target = target.clone().detach().to(device).type(torch.float)
         optimizer.zero_grad()
         output = reg_model(fmap)
         loss = F.mse_loss(output, target)
@@ -103,5 +104,4 @@ if __name__=='__main__':
         test_losses.append(test_loss)
         if test_loss<min_loss:
             min_loss = test_loss
-            best_model = deepcopy(reg_model)
-    torch.save(best_model.state_dict(),"saved_models/"+args.task_name+"_reg_model.pth")
+            torch.save(reg_model.state_dict(),"saved_models/"+args.task_name+"_reg_model.pth")

@@ -63,14 +63,16 @@ class ReconstructionDataset(Dataset):
         return image
 
 class RegressionDataset(Dataset):
-    def __init__(self,pt_file,encoder):
+    def __init__(self, pt_file, encoder, device):
         self.data = torch.load(pt_file)
+        self.device = device
         #Data is a list of [image_name,image_array,fMRI_array]
-        self.encoder = encoder
+        self.encoder = encoder.to(device)
 
     def __len__(self):
         return len(self.data)
     
     def __getitem__(self,idx):
-        img = torch.tensor(self.data[idx][1]).unsqueeze(0)
-        return self.encoder(img),self.data[idx][2]
+        img = torch.tensor(self.data[idx][1]).unsqueeze(0).to(self.device)
+
+        return self.encoder(img), self.data[idx][2]

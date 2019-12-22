@@ -62,6 +62,7 @@ class RegressionDecoder(nn.Module):
         sizes = [64*28*28,128*14*14,256*14*14,512*7*7,512]
         self.linear1 = nn.Linear(in_features = sum(sizes[starting_layer:ending_layer+1]), out_features=1024)
         self.linear2 = nn.Linear(in_features=1024, out_features=4438)
+        
     def forward(self, fmap):
         out = self.linear1(fmap)
         out = self.linear2(out)
