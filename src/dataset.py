@@ -22,7 +22,7 @@ def ID_to_picture(image_id, task_idx=1):
     if type(img)!=np.ndarray:
         image_path = "/dev/shm/mscoco/{}2014/COCO_{}2014_{:012d}.jpg".format('val','val',image_id)
         img = cv2.imread(image_path)
-    res = cv2.resize(img, dsize=(224, 224), interpolation=cv2.INTER_CUBIC)
+    res = cv2.resize(img, dsize=(224, 224), interpolation=cv2.INTER_LINEAR)
     res = np.swapaxes(res,0,2)
     res = np.swapaxes(res,1,2)
     res = np.ndarray.astype(res,np.float32)/255
