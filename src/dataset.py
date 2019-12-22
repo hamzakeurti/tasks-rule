@@ -67,9 +67,10 @@ class RegressionDataset(Dataset):
         self.data = torch.load(pt_file)
         #Data is a list of [image_name,image_array,fMRI_array]
         self.encoder = encoder
+
     def __len__(self):
-        return len(self.images)
+        return len(self.data)
     
     def __getitem__(self,idx):
         img = torch.tensor(self.data[idx][1]).unsqueeze(0)
-        return encoder(img),self.data[idx][2]
+        return self.encoder(img),self.data[idx][2]

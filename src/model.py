@@ -54,3 +54,12 @@ class ReconstructionDecoder(nn.Module):
         x_hat = self.linear(code)
         x_hat = x_hat.view((-1,)+self.ouput_shape)
         return x_hat
+
+class RegressionDecoder(nn.Module):
+    def __init__(self,starting_layer,ending_layer):
+        super(RegressionDecoder,self).__init__()
+        sizes = [64*56*56,128*28*28,256*14*14,512*7*7,512]
+        self.linear = nn.Linear(in_features = sum(sizes[starting_layer:ending_layer+1]) ,out_features = 4438)
+    def forward(self,fmap):
+        out = self.linear(fmap)
+        return out
