@@ -29,7 +29,6 @@ args = parser.parse_args()
 
 
 device = args.device
-pt_file = '/data3/valentin/datasets/images_fmri.pt'
 pt_file = '/dev/shm/images_fmri.pt'
 
 
@@ -43,10 +42,8 @@ torch.manual_seed(0)
 lengths = [int(len(reg_dataset)*0.8), len(reg_dataset)-int(len(reg_dataset)*0.8)]
 train_dataset, test_dataset = random_split(reg_dataset, lengths)
 
-train_loader,test_loader = DataLoader(train_dataset,batch_size=args.batch_size,shuffle=True,drop_last=True),DataLoader(test_dataset,batch_size=args.batch_size,shuffle=True,drop_last=True)
-
-
-
+train_loader = DataLoader(train_dataset,batch_size=args.batch_size,shuffle=True,drop_last=True)
+test_loader = DataLoader(test_dataset,batch_size=args.batch_size,shuffle=True,drop_last=True)
 reg_model = RegressionDecoder(args.starting_layer,args.ending_layer).to(device)
 
 optimizer = optim.Adam(reg_model.parameters(), lr=args.learning_rate, weight_decay=args.weight_decay, amsgrad=True)
